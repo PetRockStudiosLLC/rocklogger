@@ -38,6 +38,7 @@ export interface ObservedTraits {
   gravity?: "light" | "medium" | "heavy";
   colors?: string[];
   habit?: string[];
+  texture?: TextureId;
 }
 
 export interface RockEntry {
@@ -88,6 +89,26 @@ export const HABITS = [
   "granular",
   "massive",
 ] as const;
+
+/**
+ * Macro-texture pre-classification (multi-stage ID).
+ * Chosen FIRST in the quiz — narrows the field before fine traits.
+ * Each maps to the habit terms it implies; conflicts get a strong
+ * penalty in the engine to suppress false positives.
+ */
+export const TEXTURES = [
+  { id: "glassy", label: "Smooth & glassy — like dark bottle glass", habits: ["glassy"] },
+  { id: "fine", label: "Solid, no visible grains (fine-grained)", habits: ["massive"] },
+  { id: "coarse", label: "Visible grains or crystals", habits: ["granular", "crystals"] },
+  { id: "layered", label: "Layered, banded or striped", habits: ["layered", "banded"] },
+  { id: "porous", label: "Full of holes — bubbly / sponge-like", habits: ["porous"] },
+  { id: "chalky", label: "Chalky / powdery / crumbly", habits: ["chalky"] },
+  { id: "fibrous", label: "Fibrous or thread-like", habits: ["fibrous"] },
+] as const;
+export type TextureId = (typeof TEXTURES)[number]["id"];
+
+/** How distinctive a match is relative to its runner-up (calibrated confidence). */
+export type Confidence = "high" | "medium" | "low" | "tie";
 
 export const COLORS = [
   "white",

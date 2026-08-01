@@ -2,18 +2,21 @@
 
 import * as db from "../db";
 import {
+  CONFIDENCE_LABEL,
   GRAVITY_CHOICES,
   HARDNESS_CHOICES,
   LUSTER_CHOICES,
+  TEXTURE_CHOICES,
   answersToTraits,
   identifyRock,
   type IdentifyAnswer,
 } from "../identify";
 import { findSpec } from "../knowledge";
-import { COLORS, HABITS } from "../types";
+import { COLORS, HABITS, type Confidence } from "../types";
 import { esc, toast } from "../utils";
 
 const STEPS = [
+  { key: "texture", title: "How does it look up close?", hint: "Macro texture first — this alone rules out whole families of rocks." },
   { key: "hardness", title: "How hard is it?", hint: "Try scratch tests on a hidden part. Start soft, go harder." },
   { key: "luster", title: "How does it shine?", hint: "Look at how light reflects off a fresh surface." },
   { key: "gravity", title: "How heavy does it feel?", hint: "Compare to a similar-sized stone you know." },
@@ -126,7 +129,11 @@ function renderStep(state: ViewState, root: HTMLElement, reset = false): void {
   const answered = !!state.answers[key as keyof IdentifyAnswer];
 
   let optionsHtml = "";
-  if (key === "hardness") {
+  if (key === "texture") {
+    optionsHtml = `<div class="chips">${TEXTURE_CHOICES.map(
+      (t) => `<span class="chip ${state.answers.texture === t.id ? "on" : ""}" data-action="id-pick" data-step="texture" data-value="${t.id}">${esc(t.label)}</span>`
+    ).join("")}</div>`;
+  } else if (key === "hardness") {
     optionsHtml = HARDNESS_CHOICES.map(
       (h) => `
         <label class="guide-item" style="display:flex; flex-direction:column; align-items:flex-start; gap:2px; ${
@@ -217,6 +224,8 @@ function prevStep(state: ViewState, root: HTMLElement): void {
 
 function renderResults(state: ViewState, root: HTMLElement): void {
   const results = identifyRock(state.answers);
+  const top = results[0];
+  const closeCall = !!top && top.confidence !== "high" && results.length > 1;
   root.innerHTML = `
     <div class="q-progress"><div class="bar" style="width:100%"></div></div>
     <h2>${results.length ? "🎯 Your matches" : "No matches yet"}</h2>
@@ -227,6 +236,11 @@ function renderResults(state: ViewState, root: HTMLElement): void {
           : "Nothing matched — try again with looser answers (skip more questions)."
       }
     </p>
+    ${
+      closeCall
+        ? `<div class="warn" style="background:var(--warn-bg,#3a2f1a); border:1px solid #8a6d2f; border-radius:10px; padding:10px 12px; margin-bottom:12px; font-size:13px">⚠️ <b>Close call</b> — several rocks scored within a point of each other. Your answers fit more than one candidate. Compare the 💡 hints, or go back and answer the questions you skipped (texture especially) to narrow it down.</div>`
+        : ""
+    }
     ${results
       .slice(0, 8)
       .map(
@@ -235,6 +249,7 @@ function renderResults(state: ViewState, root: HTMLElement): void {
             <div class="top">
               <span class="rname">${m.spec.emoji ?? ""} ${esc(m.spec.name)}</span>
               <span class="pct">${m.pct}%</span>
+              ${confidenceBadge(m.confidence)}
             </div>
             <div class="looks">${esc(m.spec.looks)}</div>
             <div class="pctbar"><div class="fill" style="width:${m.pct}%"></div></div>
@@ -285,6 +300,17 @@ function renderResults(state: ViewState, root: HTMLElement): void {
       }
     });
   }
+}
+
+/** Small colored badge for a match's calibrated confidence. */
+export function confidenceBadge(c: Confidence): string {
+  const styles: Record<Confidence, string> = {
+    high: "background:#1d3a26; color:#7ee2a8; border:1px solid #2f6b45",
+    medium: "background:#3a2f1a; color:#e8c36a; border:1px solid #8a6d2f",
+    low: "background:var(--bg2,#26241f); color:#9a948a; border:1px solid #4a463e",
+    tie: "background:var(--bg2,#26241f); color:#b9b2a5; border:1px solid #4a463e",
+  };
+  return `<span class="conf" style="font-size:11px; padding:2px 7px; border-radius:999px; ${styles[c]}">${CONFIDENCE_LABEL[c]}</span>`;
 }
 
 async function saveMatch(state: ViewState, typeId: string): Promise<void> {

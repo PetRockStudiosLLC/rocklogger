@@ -5,6 +5,7 @@ import { identifyRock, traitsSummary, HARDNESS_CHOICES } from "../identify";
 import { findSpec } from "../knowledge";
 import type { RockEntry } from "../types";
 import { coordsLabel, esc, fmtDate, toast } from "../utils";
+import { confidenceBadge } from "./identify";
 
 export function renderDetail(id: string): HTMLElement {
   const root = document.createElement("div");
@@ -103,6 +104,7 @@ function detailHtml(entry: RockEntry): string {
                      <div class="top">
                        <span class="rname">${m.spec.emoji ?? ""} ${esc(m.spec.name)}</span>
                        <span class="pct">${m.pct}%</span>
+                       ${confidenceBadge(m.confidence)}
                      </div>
                      <div class="looks">${esc(m.spec.looks)}</div>
                      <div class="pctbar"><div class="fill" style="width:${m.pct}%"></div></div>
@@ -139,6 +141,7 @@ function identifyFromTraits(entry: RockEntry) {
     gravity: t.gravity,
     colors: t.colors,
     habit: t.habit,
+    texture: t.texture,
   }).slice(0, 4);
 }
 
