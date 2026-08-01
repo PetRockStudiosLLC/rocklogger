@@ -1,0 +1,26 @@
+{
+  "name": "rocklogger",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "RockLogger — document rocks you find and identify them with a trait-based field guide",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "icons": "node scripts/gen-icons.mjs",
+    "test:sanity": "tsx scripts/sanity.ts",
+    "test:dom": "tsx scripts/dom-test.ts",
+    "test": "npm run test:sanity && npm run test:dom",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
+    "jsdom": "^30.0.1",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
+  }
+}

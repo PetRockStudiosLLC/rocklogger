@@ -1,0 +1,32 @@
+{
+  "name": "RockLogger — Rock Journal & Field Guide",
+  "short_name": "RockLogger",
+  "description": "Document the rocks you find with photos, location and notes, and identify them with a trait-based field guide.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1b1a17",
+  "theme_color": "#2c2a26",
+  "categories": ["lifestyle", "education", "utilities"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
