@@ -1,4 +1,5 @@
 # 🪨 RockLogger
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/petrockstudios)
 
 Document the rocks you find and identify them with a trait-based field guide.
 
